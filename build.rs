@@ -138,6 +138,7 @@ mod hip {
         let builder = Builder::default();
 
         // Specify the libraries to link against
+        println!("cargo:rustc-link-lib=dylib=stdc++");
         println!("cargo:rustc-link-lib=dylib=hipblas");
         println!("cargo:rustc-link-lib=dylib=rocblas");
         println!("cargo:rustc-link-lib=dylib=amdhip64");
@@ -174,7 +175,7 @@ mod hip {
         println!("cargo:rerun-if-changed=./src/backend/kernels/hip");
 
         // Get the gcnArchName from hipInfo.exe, since hipcc lies about doing it itself
-        let gcn_arch_name = get_gcn_arch_name().expect("Failed to get gcnArchName from hipInfo.exe");
+        let gcn_arch_name = "gfx1030".to_string();
 
         let files: Vec<String> =
             ["backprops", "bufops", "mpe", "pairwise_mul", "select", "sparse_affine", "splat_add", "update"]
@@ -196,20 +197,6 @@ mod hip {
             .flag(&format!("--offload-arch={}", gcn_arch_name))
             .flag("-munsafe-fp-atomics") // Required since AMDGPU doesn't emit hardware atomics by default
             .compile("libkernels.a");
-    }
-
-    fn get_gcn_arch_name() -> Option<String> {
-        let output = Command::new("hipInfo").output().expect("Failed to execute hipInfo.exe");
-
-        if output.status.success() {
-            let output_str = String::from_utf8_lossy(&output.stdout);
-            for line in output_str.lines() {
-                if line.contains("gcnArchName:") {
-                    return line.split_whitespace().last().map(String::from);
-                }
-            }
-        }
-        None
     }
 
     fn get_var_path(name: &str) -> PathBuf {
