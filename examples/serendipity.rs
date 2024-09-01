@@ -2,7 +2,7 @@ use bullet_lib::{
     inputs, lr, optimiser, outputs, wdl, Activation, LocalSettings, Loss, TrainerBuilder, TrainingSchedule,
 };
 
-const HIDDEN_SIZE: usize = 1024;
+const HIDDEN_SIZE: usize = 1536;
 const QA: i32 = 255;
 const QB: i32 = 64;
 
