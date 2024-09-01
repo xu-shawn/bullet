@@ -49,7 +49,7 @@ fn main() {
 
     let settings = LocalSettings {
         threads: 4,
-        data_file_paths: vec!["/home/shawn/Documents/Games/Chess/nnue-data/test77-600M-filtered-shuffled.bin"],
+        data_file_paths: vec!["/mnt/disks/nnue/nnue_data/test77.bin"],
         test_set: None,
         output_directory: "checkpoints",
     };
