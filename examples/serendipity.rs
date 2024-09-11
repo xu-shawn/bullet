@@ -10,15 +10,15 @@ fn main() {
     let mut trainer = TrainerBuilder::default()
         .quantisations(&[QA, QB])
         .optimiser(optimiser::AdamW)
-        .input(inputs::ChessBuckets::new([
-            0, 0, 1, 1, 2, 2, 3, 3,
-            4, 4, 4, 4, 5, 5, 5, 5,
-            6, 6, 6, 6, 6, 6, 6, 6,
-            6, 6, 6, 6, 6, 6, 6, 6,
-            6, 6, 6, 6, 6, 6, 6, 6,
-            6, 6, 6, 6, 6, 6, 6, 6,
-            6, 6, 6, 6, 6, 6, 6, 6,
-            6, 6, 6, 6, 6, 6, 6, 6,
+        .input(inputs::ChessBucketsMirrored::new([
+            0, 0, 1, 1,
+            2, 2, 2, 2,
+            3, 3, 3, 3,
+            3, 3, 3, 3,
+            3, 3, 3, 3,
+            3, 3, 3, 3,
+            3, 3, 3, 3,
+            3, 3, 3, 3,
         ]))
         .output_buckets(outputs::MaterialCount::<8>::default())
         .feature_transformer(HIDDEN_SIZE)
