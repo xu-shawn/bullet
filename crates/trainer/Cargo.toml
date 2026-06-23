@@ -26,7 +26,3 @@ path = "../../examples/ataxx.rs"
 [[example]]
 name = "test4"
 path = "../../examples/tests/test4.rs"
-
-[[example]]
-name = "serendipity"
-path = "../../examples/serendipity.rs"

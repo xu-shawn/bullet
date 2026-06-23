@@ -12,7 +12,7 @@ use bullet_lib::{
         schedule::{TrainingSchedule, TrainingSteps, lr, wdl},
         settings::LocalSettings,
     },
-    value::{ValueTrainerBuilder, loader::DirectSequentialDataLoader},
+    value::{ValueTrainerBuilder, loader},
 };
 
 const HIDDEN_SIZE: usize = 1536;
@@ -22,7 +22,7 @@ const QB: i16 = 64;
 
 const NUM_OUTPUT_BUCKETS: usize = 8;
 #[rustfmt::skip]
-const BUCKET_LAYOUT: [usize; 32] = [
+const BUCKET_LAYOUT: [usize; 64] = [
     0, 0, 1, 1, 2, 2, 3, 3,
     4, 4, 4, 4, 5, 5, 5, 5,
     6, 6, 6, 6, 6, 6, 6, 6,
@@ -47,7 +47,7 @@ fn main() {
             SavedFormat::id("l1b").round().quantise::<i16>(QA * QB),
         ])
         .loss_fn(|output, target| output.sigmoid().squared_error(target))
-        .build(|builder, stm_inputs, ntm_inputs| {
+        .build(|builder, stm_inputs, ntm_inputs, output_buckets| {
             let l0 = builder.new_affine("l0", 768 * NUM_INPUT_BUCKETS, HIDDEN_SIZE);
             let l1 = builder.new_affine("l1", 2 * HIDDEN_SIZE, NUM_OUTPUT_BUCKETS);
 
