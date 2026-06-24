@@ -69,7 +69,7 @@ fn main() {
         },
         wdl_scheduler: wdl::ConstantWDL { value: 0.0 },
         lr_scheduler: lr::StepLR { start: 0.001, gamma: 0.992, step: 1 },
-        save_rate: 1,
+        save_rate: 10,
     };
 
     let settings = LocalSettings { threads: 4, test_set: None, output_directory: "checkpoints", batch_queue_size: 64 };
@@ -77,7 +77,7 @@ fn main() {
     let data_loader = {
         use loader::sfbinpack::{MoveType, PieceType, SfBinpackLoader, TrainingDataEntry};
 
-        let file_path = "/workspace/test80-2024-02-feb-2tb7p.min-v2.v6.binpack";
+        let file_path = "/workspace/test77-dec2021-16tb7p.no-db.min.binpack";
         let buffer_size_mb = 1024;
         let threads = 4;
 
