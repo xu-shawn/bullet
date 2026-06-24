@@ -41,14 +41,25 @@ fn main() {
         .inputs(ChessBuckets::new(BUCKET_LAYOUT))
         .output_buckets(MaterialCount::<NUM_OUTPUT_BUCKETS>)
         .save_format(&[
-            SavedFormat::id("l0w").round().quantise::<i16>(QA),
+            SavedFormat::id("l0w")
+                .transform(|store, weights| {
+                    let factorizer = store.get("l0f").values.f32().repeat(NUM_INPUT_BUCKETS);
+                    weights.into_iter().zip(factorizer).map(|(a, b)| a + b).collect()
+                })
+                .round()
+                .quantise::<i16>(QA),
             SavedFormat::id("l0b").round().quantise::<i16>(QA),
             SavedFormat::id("l1w").round().quantise::<i16>(QB),
             SavedFormat::id("l1b").round().quantise::<i16>(QA * QB),
         ])
         .loss_fn(|output, target| output.sigmoid().squared_error(target))
         .build(|builder, stm_inputs, ntm_inputs, output_buckets| {
-            let l0 = builder.new_affine("l0", 768 * NUM_INPUT_BUCKETS, HIDDEN_SIZE);
+            let l0f = builder.new_weights("l0f", Shape::new(HIDDEN_SIZE, 768), InitSettings::Zeroed);
+            let expanded_factorizer = l0f.repeat(NUM_INPUT_BUCKETS);
+
+            let mut l0 = builder.new_affine("l0", 768 * NUM_INPUT_BUCKETS, HIDDEN_SIZE);
+            l0.weights = l0.weights + expanded_factorizer;
+
             let l1 = builder.new_affine("l1", 2 * HIDDEN_SIZE, NUM_OUTPUT_BUCKETS);
 
             let stm_hidden = l0.forward(stm_inputs).screlu();
@@ -57,6 +68,10 @@ fn main() {
 
             l1.forward(hidden_layer).select(output_buckets)
         });
+
+    let stricter_clipping = AdamWParams { max_weight: 0.99, min_weight: -0.99, ..Default::default() };
+    trainer.optimiser.set_params_for_weight("l0w", stricter_clipping);
+    trainer.optimiser.set_params_for_weight("l0f", stricter_clipping);
 
     let schedule = TrainingSchedule {
         net_id: "serendipity".to_string(),
