@@ -77,7 +77,7 @@ fn main() {
     let data_loader = {
         use loader::sfbinpack::{MoveType, PieceType, SfBinpackLoader, TrainingDataEntry};
 
-        let file_path = "/workspace/test77-dec2021-16tb7p.no-db.min.binpack";
+        let file_path = "/workspace/interleave_t77-2021-12_t78-2022-01-to-05.v6-dd.min.binpack";
         let buffer_size_mb = 1024;
         let threads = 4;
 
