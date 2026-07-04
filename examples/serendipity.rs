@@ -97,9 +97,10 @@ fn main() {
         let threads = 4;
 
         fn filter(entry: &TrainingDataEntry) -> bool {
-            !entry.pos.is_checked(entry.pos.side_to_move())
-                && entry.score != 32002
+            entry.mv.mtype() == MoveType::Normal
                 && entry.pos.piece_at(entry.mv.to()).piece_type() == PieceType::None
+                && entry.score.unsigned_abs() <= 10000
+                && !entry.pos.is_checked(entry.pos.side_to_move())
         }
 
         SfBinpackLoader::new(file_path, buffer_size_mb, threads, filter)
